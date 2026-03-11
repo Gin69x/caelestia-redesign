@@ -1,42 +1,81 @@
 # caelestia-redesign
 
-A customised Hyprland desktop built on [Caelestia](https://github.com/caelestia-dots) and [Quickshell](https://quickshell.outfoxxed.me/), featuring animated GIF wallpapers with synced audio, a red/black `montagem` colour scheme, and a one-shot install script for Arch Linux.
+A heavily modified fork of [Caelestia](https://github.com/caelestia-dots) built on [Quickshell](https://quickshell.outfoxxed.me/) and [Hyprland](https://hyprland.org/), featuring a completely redesigned shell layout, animated GIF wallpapers with synced audio, a dynamic lock screen, task manager, extended utilities panel, and a custom red/black `montagem` colour scheme. All components continue to follow Caelestia's theming system.
 
 ---
 
-## Preview
+## Screenshots
 
-> `Super` opens the launcher. `>wallpaper` to browse GIFs. `>scheme` to switch colour scheme.
+| Dashboard + Sidebar | Top Bar |
+|---|---|
+| ![dashboard](https://i.imgur.com/placeholder1.png) | ![bar](https://i.imgur.com/placeholder2.png) |
 
----
-
-## Features
-
-- **Hyprland** — tiling Wayland compositor, workspace groups, gestures, polished animations
-- **Caelestia shell** (Quickshell) — bar, launcher, notifications, dashboard, control center, OSD
-- **Animated GIF wallpapers** via `swww` — audio synced per-wallpaper (place a `.mp3` next to your `.gif`)
-- **montagem** colour scheme — deep black with `#E90023` red as primary
-- **Custom launcher actions** — colour picker, task killer, wallpaper gallery, scheme/variant switcher
-- **Fish** default shell
-- Wallpaper + audio auto-restore on login
+| Lock Screen | Task Manager |
+|---|---|
+| ![lock](https://i.imgur.com/placeholder3.png) | ![taskmanager](https://i.imgur.com/placeholder4.png) |
 
 ---
 
-## Install
+## What's Changed From Caelestia
 
-```bash
-git clone https://github.com/yourusername/caelestia-redesign.git
-cd caelestia-redesign
-bash install.sh
-```
+### Layout
 
-Log out → select **Hyprland** → log back in.
+| Component | Original Caelestia | This Fork |
+|---|---|---|
+| Top bar | Full horizontal bar with all widgets | Minimal top bar — workspaces, active window, clock, tray |
+| Left panel | None | New vertical **DashSidebar** with dashboard + notifications |
+| Utilities drawer | Basic toggles + recording | Expanded: media card, network panel, bluetooth panel, power card, toggles |
+| Dock | None | New app dock (`modules/dock/`) |
+
+### New Modules (not in original Caelestia)
+
+- **`modules/dashsidebar/`** — Vertical sidebar replacing the original bar's dashboard role. Contains `DashSidebar.qml`, `DashSidebarWindow.qml`, `DashSidebarPreview.qml`, `BorderWindow.qml`
+- **`modules/dock/`** — App dock. `DockBar.qml`, `DockWindow.qml`
+- **`modules/taskmanager/`** — Full task manager (open with `Super + Esc`). Shows running apps and system processes with CPU/memory usage. `TaskManager.qml`, `TaskManagerFactory.qml`, `ProcessesTab.qml`, `ServicesTab.qml`
+- **`modules/lock/AlbumAccentColor.qml`** — Extracts dominant colour from the currently playing song's album art thumbnail
+- **`modules/lock/MediaLockContent.qml`** — Dynamic lock screen layout used when media is playing
+- **`modules/utilities/cards/BluetoothPanel.qml`** — Bluetooth device management in utilities drawer
+- **`modules/utilities/cards/MediaCard.qml`** — Now-playing card in utilities drawer
+- **`modules/utilities/cards/NetworkPanel.qml`** — Wi-Fi network list + speed monitor in utilities drawer
+- **`modules/utilities/cards/PowerCard.qml`** — Power profile switcher in utilities drawer
+- **`modules/controlcenter/wifi/`** — Full Wi-Fi settings pane (`WifiPane.qml`, `NetworkList.qml`, `NetworkDetails.qml`, `NetworkSettings.qml`)
+- **`modules/controlcenter/bluetooth/`** — Full Bluetooth settings pane (kept from upstream Caelestia but wired into the redesigned control center)
+
+### Modified Files (changed from original Caelestia)
+
+| File | What Changed |
+|---|---|
+| `shell.qml` | Wires in dashsidebar, dock, taskmanager; removes original bar role |
+| `modules/bar/BarWrapper.qml` | Redesigned as slim top bar only |
+| `modules/bar/DashSidebarWrapper.qml` | **New** — wrapper that positions the sidebar |
+| `modules/bar/components/workspaces/` | Restyled workspace indicators (ActiveIndicator, OccupiedBg, SpecialWorkspaces, Workspace, Workspaces) |
+| `modules/drawers/Drawers.qml` | Updated to account for new sidebar + dock geometry |
+| `modules/drawers/Backgrounds.qml` | Blur/background adjustments for new layout |
+| `modules/drawers/Interactions.qml` | Interaction zones updated for sidebar |
+| `modules/drawers/Panels.qml` | Panel sizing updated for new layout |
+| `modules/controlcenter/Panes.qml` | Added Network and Bluetooth panes |
+| `modules/controlcenter/Session.qml` | Minor layout adjustments |
+| `modules/dashboard/Content.qml` | Adapted for sidebar context |
+| `modules/lock/Content.qml` | Dynamic lock — uses album art colour when media plays, standard lock when not |
+| `modules/lock/LockSurface.qml` | Passes album accent colour through to background |
+| `modules/lock/NotifGroup.qml` | Notification styling on lock screen |
+| `modules/utilities/Content.qml` | Adds media card, network panel, bluetooth panel, power card |
+| `modules/utilities/Wrapper.qml` | Layout updated for expanded utilities |
+| `modules/utilities/cards/Toggles.qml` | Additional quick toggles added |
+| `modules/Shortcuts.qml` | Added `Super + Esc` → task manager |
+| `services/Wallpapers.qml` | swww instead of caelestia wallpaper; GIF + per-wallpaper audio sync |
+| `services/Brightness.qml` | Minor adjustments |
+| `services/IdleInhibitor.qml` | Minor adjustments |
+| `services/Network.qml` | Wired into new network panel |
+| `config/UserPaths.qml` | Wallpaper dir set to `~/Pictures/Wallpapers/Animated` |
+| `config/UtilitiesConfig.qml` | Toast config adjustments |
+| `utils/Images.qml` | Added GIF to valid image extensions |
 
 ---
 
-## Wallpapers & Audio
+## Animated Wallpaper + Audio
 
-Drop files into `~/Pictures/Wallpapers/Animated/`. To pair audio with a GIF, name them identically:
+Drop files into `~/Pictures/Wallpapers/Animated/`. To pair audio with a GIF, use the same basename:
 
 ```
 ~/Pictures/Wallpapers/Animated/
@@ -46,43 +85,27 @@ Drop files into `~/Pictures/Wallpapers/Animated/`. To pair audio with a GIF, nam
 
 Supported audio formats: `mp3 ogg flac wav opus m4a`
 
-The audio starts after swww's transition finishes (~4.3s) and loops until you switch wallpaper.
+Audio starts after swww's transition (~4.3s) and loops until you switch wallpaper. On login, the last wallpaper and its audio are automatically restored.
 
 ---
 
-## Cursor
+## Dynamic Lock Screen
 
-The cursor is not included. Install any Xcursor-compatible theme and set it in `~/.config/caelestia/hypr-user.conf`:
-
-```ini
-env = HYPRCURSOR_THEME, YourThemeName
-env = XCURSOR_THEME, YourThemeName
-env = HYPRCURSOR_SIZE, 32
-env = XCURSOR_SIZE, 32
-```
+- **Media playing** → lock screen background takes the dominant colour from the current song's album art (`AlbumAccentColor.qml` + `MediaLockContent.qml`)
+- **No media** → standard Caelestia lock screen with slight layout modifications
+- All colours still follow Caelestia's active colour scheme
 
 ---
 
-## Structure
+## Install
 
+```bash
+git clone https://github.com/Gin69x/caelestia-redesign.git
+cd caelestia-redesign
+bash install.sh
 ```
-.
-├── install.sh
-├── hypr/
-│   ├── hyprland.conf          # Main entry point
-│   ├── variables.conf         # Keybinds, gaps, apps, etc.
-│   ├── hyprland/              # Modular sub-configs
-│   ├── scheme/default.conf    # Default colour scheme
-│   └── scripts/               # startup-lock, wsaction, etc.
-├── caelestia/
-│   ├── shell.json             # Launcher actions, apps, services
-│   ├── hypridle.conf
-│   └── hypr-user.conf.example # Copy → ~/.config/caelestia/hypr-user.conf
-├── quickshell/caelestia/      # Modified Quickshell shell
-│   ├── services/Wallpapers.qml   # swww + GIF audio sync
-│   └── utils/scripts/wallpaper-audio
-└── schemes/montagem/          # Custom red/black colour scheme
-```
+
+Log out → select **Hyprland** → log back in.
 
 ---
 
@@ -91,6 +114,7 @@ env = XCURSOR_SIZE, 32
 | Binding | Action |
 |---|---|
 | `Super` | Launcher |
+| `Super + Esc` | Task manager |
 | `Super + T` | Terminal (foot) |
 | `Super + W` | Browser (Zen) |
 | `Super + E` | File manager (Thunar) |
@@ -102,7 +126,7 @@ env = XCURSOR_SIZE, 32
 | `Super + V` | Clipboard history |
 | `Super + .` | Emoji picker |
 | `Super + Shift + S` | Screenshot region |
-| `Ctrl+Shift+Esc` | System monitor |
+| `Ctrl+Shift+Esc` | System monitor (btop) |
 | `Ctrl+Super+Shift+R` | Restart shell |
 
 ---
@@ -111,11 +135,18 @@ env = XCURSOR_SIZE, 32
 
 - Personal overrides: `~/.config/caelestia/hypr-user.conf` (not tracked)
 - Variable overrides: `~/.config/caelestia/hypr-vars.conf` (not tracked)
+- Edit `~/.config/caelestia/shell.json` for launcher actions, default apps, weather location
+
+---
+
+## Custom Colour Schemes
+
+This repo includes the `montagem` scheme — deep black base with `#E90023` red as primary. Switch via `>scheme` in the launcher.
 
 ---
 
 ## Credits
 
-- [Caelestia](https://github.com/caelestia-dots) — CLI + shell framework
-- [Quickshell](https://quickshell.outfoxxed.me/) — QML shell
+- [Caelestia](https://github.com/caelestia-dots) — original shell, CLI framework, and theming system
+- [Quickshell](https://quickshell.outfoxxed.me/) — QML shell compositor
 - [swww](https://github.com/LGFae/swww) — animated wallpaper daemon
