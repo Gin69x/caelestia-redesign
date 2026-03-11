@@ -43,6 +43,7 @@ PACMAN_PKGS=(
     trash-cli networkmanager blueman
     gnome-keyring polkit-gnome
     vesktop python-materialyoucolor
+    # Caelestia — installed first so our configs layer on top correctly
     caelestia-cli caelestia-meta caelestia-shell
 )
 
@@ -75,18 +76,20 @@ mkdir -p \
     "$HOME/.config/hypr/hyprland" \
     "$HOME/.config/hypr/scripts" \
     "$HOME/.config/caelestia" \
-    "$HOME/.config/quickshell" \
+    "$HOME/.config/quickshell/caelestia" \
     "$HOME/Pictures/Wallpapers/Animated"
 
 # ── Hyprland configs ──────────────────────────────────────────────────────────
 info "Copying Hyprland configs..."
-cp -r "$REPO/hypr/hyprland/." "$HOME/.config/hypr/hyprland/"
-cp    "$REPO/hypr/scheme/default.conf" "$HOME/.config/hypr/scheme/"
-cp    "$REPO/hypr/hyprland.conf"       "$HOME/.config/hypr/"
-cp    "$REPO/hypr/variables.conf"      "$HOME/.config/hypr/"
+# rsync used throughout: --delete removes files no longer in repo on reinstall,
+# --checksum skips files that haven't changed.
+rsync -a --checksum "$REPO/hypr/hyprland/" "$HOME/.config/hypr/hyprland/"
+rsync -a --checksum "$REPO/hypr/scheme/"   "$HOME/.config/hypr/scheme/"
+cp "$REPO/hypr/hyprland.conf"  "$HOME/.config/hypr/"
+cp "$REPO/hypr/variables.conf" "$HOME/.config/hypr/"
 
 info "Copying scripts..."
-cp "$REPO/hypr/scripts/"* "$HOME/.config/hypr/scripts/"
+rsync -a --checksum "$REPO/hypr/scripts/" "$HOME/.config/hypr/scripts/"
 chmod +x "$HOME/.config/hypr/scripts/"*
 
 # ── Caelestia config ──────────────────────────────────────────────────────────
@@ -99,12 +102,16 @@ if [[ ! -f "$HOME/.config/caelestia/hypr-user.conf" ]]; then
     cp "$REPO/caelestia/hypr-user.conf.example" "$HOME/.config/caelestia/hypr-user.conf"
     warn "Created hypr-user.conf from example — edit it to set your cursor and monitor layout."
 fi
-
 [[ ! -f "$HOME/.config/caelestia/hypr-vars.conf" ]] && touch "$HOME/.config/caelestia/hypr-vars.conf"
 
-# ── Quickshell config ─────────────────────────────────────────────────────────
+# ── Quickshell config — overlaid on top of the system Caelestia shell ─────────
+# caelestia-shell installs to /etc/xdg/quickshell/caelestia/ (system-wide).
+# Quickshell checks ~/.config/quickshell/caelestia/ first, so our files here
+# take precedence over and fully replace the system defaults.
 info "Copying Quickshell config..."
-cp -r "$REPO/quickshell/caelestia" "$HOME/.config/quickshell/"
+rsync -a --checksum --delete \
+    "$REPO/quickshell/caelestia/" \
+    "$HOME/.config/quickshell/caelestia/"
 chmod +x "$HOME/.config/quickshell/caelestia/utils/scripts/wallpaper-audio" 2>/dev/null || true
 
 # ── Custom colour schemes ─────────────────────────────────────────────────────
@@ -113,13 +120,9 @@ if [[ -d "$REPO/schemes" ]]; then
     SCHEMES_DIR="/usr/lib/python3.13/site-packages/caelestia/data/schemes"
     for scheme_dir in "$REPO/schemes"/*/; do
         name=$(basename "$scheme_dir")
-        if [[ ! -d "$SCHEMES_DIR/$name" ]]; then
-            sudo mkdir -p "$SCHEMES_DIR/$name"
-            sudo cp -r "$scheme_dir/." "$SCHEMES_DIR/$name/"
-            success "Scheme installed: $name"
-        else
-            warn "Scheme '$name' already exists — skipping."
-        fi
+        sudo mkdir -p "$SCHEMES_DIR/$name"
+        sudo rsync -a --checksum "$scheme_dir" "$SCHEMES_DIR/$name/"
+        success "Scheme installed: $name"
     done
 fi
 
@@ -134,10 +137,8 @@ fi
 # ── Services ──────────────────────────────────────────────────────────────────
 info "Enabling user audio services..."
 systemctl --user enable --now pipewire pipewire-pulse wireplumber 2>/dev/null || true
-
 info "Enabling NetworkManager..."
 sudo systemctl enable --now NetworkManager 2>/dev/null || true
-
 xdg-user-dirs-update 2>/dev/null || true
 
 # ── Done ──────────────────────────────────────────────────────────────────────
@@ -149,6 +150,6 @@ echo ""
 echo -e "  ${BOLD}After logging in:${RESET}"
 echo -e "  • Drop wallpapers into ${BOLD}~/Pictures/Wallpapers/Animated/${RESET}"
 echo -e "  • Pair audio: same filename as GIF (e.g. wall.gif + wall.mp3)"
-echo -e "  • Press ${BOLD}Super${RESET} to open launcher"
+echo -e "  • Press ${BOLD}Super${RESET} to open the launcher"
 echo -e "  • Edit ${BOLD}~/.config/caelestia/hypr-user.conf${RESET} for monitor/cursor"
 echo ""
