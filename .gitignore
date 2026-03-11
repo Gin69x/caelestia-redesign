@@ -1,0 +1,26 @@
+# User-specific overrides (machine-specific, not tracked)
+caelestia/hypr-user.conf
+caelestia/hypr-vars.conf
+
+# Wallpapers & media (user provides their own)
+wallpapers/
+*.gif
+*.mp4
+*.mp3
+*.ogg
+*.flac
+*.wav
+*.opus
+*.m4a
+
+# Cursor themes (user provides their own)
+cursors/
+
+# Runtime / cache
+*.log
+.cache/
+__pycache__/
+
+# OS
+.DS_Store
+Thumbs.db

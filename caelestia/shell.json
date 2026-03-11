@@ -1,0 +1,173 @@
+{
+  "appearance": {
+    "font": {
+      "family": {
+        "clock": "Rubik",
+        "mono": "CaskaydiaCove NF"
+      },
+      "size": {
+        "scale": 1
+      }
+    },
+    "transparency": {
+      "enabled": true,
+      "base": 0.9,
+      "layers": 0.4
+    }
+  },
+  "colors": {
+    "scheme": "custom",
+    "panel": "282a36ff",
+    "accent": "bd93f9ff",
+    "text": "f8f8f2ff"
+  },
+  "general": {
+    "apps": {
+      "terminal": ["foot"],
+      "explorer": ["thunar"],
+      "browser": ["zen-browser"]
+    },
+    "idle": {
+      "lockBeforeSleep": true,
+      "timeouts": [
+        { "timeout": 300, "idleAction": "lock" },
+        { "timeout": 300, "idleAction": "dpms off" },
+        { "timeout": 900, "idleAction": "sleep" }
+      ]
+    },
+    "battery": {
+      "warnLevels": [
+        { "level": 20, "title": "Low battery" }
+      ],
+      "criticalLevel": 5
+    }
+  },
+  "launcher": {
+    "enableDangerousActions": true,
+    "actions": [
+      {
+  	"name": "Color Picker",
+  	"icon": "colorize",
+ 	"description": "Pick a color from screen (copies HEX to clipboard)",
+  	"command": ["bash", "-c", "sleep 0.5 && hyprpicker -a"],
+        "enabled": true,
+        "dangerous": false
+      },
+      {
+  	"name": "Task Manager",
+  	"icon": "close",
+  	"description": "Kill resource-intensive applications",
+  	"command": ["bash", "-c", "ps aux --sort=-%cpu | awk 'NR>1 && $11 !~ /^\\[/ {cmd=$11; gsub(\".*/\", \"\", cmd); usage=$3+$4; if(usage>0.1) printf \"%-25s  CPU: %5s%%  MEM: %5s%%\\n\", cmd, $3, $4}' | sort -t: -k2 -nr | uniq | fuzzel --dmenu --prompt 'Kill: ' | awk '{print $1}' | xargs -r pkill -9 && notify-send 'Process killed!'"],
+  	"enabled": true,
+  	"dangerous": false
+      },
+      {
+        "name": "Calculator",
+        "icon": "calculate",
+        "description": "Do simple math equations (powered by Qalc)",
+        "command": ["autocomplete", "calc"],
+        "enabled": true,
+        "dangerous": false
+      },
+      {
+        "name": "Scheme",
+        "icon": "palette",
+        "description": "Change the current colour scheme",
+        "command": ["autocomplete", "scheme"],
+        "enabled": true,
+        "dangerous": false
+      },
+      {
+        "name": "Wallpaper",
+        "icon": "image",
+        "description": "Choose wallpaper from gallery (uses swww)",
+        "command": ["autocomplete", "wallpaper"],
+        "enabled": true,
+        "dangerous": false
+      },
+      {
+        "name": "Variant",
+        "icon": "colors",
+        "description": "Change the current scheme variant",
+        "command": ["autocomplete", "variant"],
+        "enabled": true,
+        "dangerous": false
+      },
+      {
+        "name": "Random",
+        "icon": "casino",
+        "description": "Switch to a random wallpaper",
+        "command": ["caelestia", "wallpaper", "-r"],
+        "enabled": false,
+        "dangerous": false
+      },
+      {
+        "name": "Light",
+        "icon": "light_mode",
+        "description": "Change the scheme to light mode",
+        "command": ["setMode", "light"],
+        "enabled": true,
+        "dangerous": false
+      },
+      {
+        "name": "Dark",
+        "icon": "dark_mode",
+        "description": "Change the scheme to dark mode",
+        "command": ["setMode", "dark"],
+        "enabled": true,
+        "dangerous": false
+      },
+      {
+        "name": "Shutdown",
+        "icon": "power_settings_new",
+        "description": "Shutdown the system",
+        "command": ["systemctl", "poweroff"],
+        "enabled": true,
+        "dangerous": true
+      },
+      {
+        "name": "Reboot",
+        "icon": "cached",
+        "description": "Reboot the system",
+        "command": ["systemctl", "reboot"],
+        "enabled": true,
+        "dangerous": true
+      },
+      {
+        "name": "Logout",
+        "icon": "exit_to_app",
+        "description": "Log out of the current session",
+        "command": ["loginctl", "terminate-user", ""],
+        "enabled": true,
+        "dangerous": true
+      },
+      {
+        "name": "Lock",
+        "icon": "lock",
+        "description": "Lock the current session",
+        "command": ["loginctl", "lock-session"],
+        "enabled": true,
+        "dangerous": false
+      },
+      {
+        "name": "Sleep",
+        "icon": "bedtime",
+        "description": "Suspend then hibernate",
+        "command": ["systemctl", "suspend-then-hibernate"],
+        "enabled": true,
+        "dangerous": false
+      }
+    ]
+  },
+  "services": {
+    "weatherLocation": "33.7884,72.7228"
+  },
+  "utilities": {
+    "toasts": {
+      "configLoaded": false
+    }
+  },
+  "paths": {
+    "wallpaperDir": "~/Pictures/Wallpapers/Animated"
+  }
+}

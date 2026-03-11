@@ -1,0 +1,24 @@
+# ──────────────────────────────────────────────────────────────────────────────
+# hypr-user.conf.example
+# Copy to ~/.config/caelestia/hypr-user.conf and customise for your machine.
+# This file is sourced by Hyprland last, so it overrides everything else.
+# ──────────────────────────────────────────────────────────────────────────────
+
+# Animated wallpaper daemon — required for GIF wallpapers
+exec-once = swww-daemon
+
+# Cursor — replace with your own theme name
+env = HYPRCURSOR_THEME, MyCustomCursors
+env = XCURSOR_THEME, MyCustomCursors
+env = HYPRCURSOR_SIZE, 32
+env = XCURSOR_SIZE, 32
+
+# Monitor layout — uncomment and adjust for your setup
+# monitor = DP-1, 1920x1080@60, 0x0, 1
+# monitor = HDMI-A-1, 1920x1080@60, 1920x0, 1
+
+# Extra window rules
+# windowrulev2 = float, class:^(Wine|winecfg|.*\.exe)$
+
+# Extra autostart
+# exec-once = your-app

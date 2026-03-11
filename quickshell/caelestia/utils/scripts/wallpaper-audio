@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# wallpaper-audio: plays a paired audio file for a gif wallpaper, looping.
+# Usage: wallpaper-audio <path-to-gif>
+# The audio file must share the same basename (e.g. montagem.gif -> montagem.mp3)
+
+WALL="$1"
+BASE="${WALL%.*}"
+
+for ext in mp3 ogg flac wav opus m4a; do
+    if [ -f "${BASE}.${ext}" ]; then
+        exec mpv --loop=inf --no-video --no-terminal \
+                 --title=wallpaper-audio \
+                 "${BASE}.${ext}"
+    fi
+done
